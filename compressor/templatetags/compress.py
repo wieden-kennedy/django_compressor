@@ -77,16 +77,27 @@ class CompressorNode(template.Node):
         compressor = self.compressor_cls(content=self.nodelist.render(context),
                                          context=context)
 
+        # # Check cache
+        # cache_key, cache_content = self.render_cached(compressor, forced)
+        # if cache_content is not None:
+        #     return cache_content
+
+        # # See if it has been rendered offline
+        # cached_offline = self.render_offline(compressor, forced)
+        # if cached_offline:
+        #     cache_set(cache_key, cached_offline)
+        #     return cached_offline
+
+        # See if it has been rendered offline
+        cached_offline = self.render_offline(compressor, forced)
+        if cached_offline:
+            return cached_offline
+
         # Check cache
         cache_key, cache_content = self.render_cached(compressor, forced)
         if cache_content is not None:
             return cache_content
 
-        # See if it has been rendered offline
-        cached_offline = self.render_offline(compressor, forced)
-        if cached_offline:
-            cache_set(cache_key, cached_offline)
-            return cached_offline
 
         # call compressor output method and handle exceptions
         rendered_output = compressor.output(self.mode, forced=forced)
